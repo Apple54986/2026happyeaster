@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>幸福彩蛋養成計畫 - 永豐餘復活節特企</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(180deg, #e0f2f1 0%, #ffffff 100%);
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        /* 彩蛋基礎樣式 */
+        .egg-container {
+            position: relative;
+            width: 200px;
+            height: 260px;
+            margin: 0 auto;
+            transition: all 0.5s ease;
+        }
+
+        .egg {
+            width: 100%;
+            height: 100%;
+            background-color: #fff;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            box-shadow: inset -10px -10px 30px rgba(0,0,0,0.1), 0 10px 20px rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
+            border: 4px solid #f0f0f0;
+            transition: all 0.8s ease;
+        }
+
+        /* 階段紋路：循環 */
+        .pattern-circular {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            background-image: radial-gradient(circle at 20px 20px, #a5d6a7 10%, transparent 10%);
+            background-size: 40px 40px;
+            transition: opacity 1s;
+        }
+
+        /* 階段紋路：綠能 */
+        .pattern-energy {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            background: linear-gradient(45deg, transparent 45%, #fff176 45%, #fff176 55%, transparent 55%);
+            background-size: 30px 30px;
+            transition: opacity 1s;
+        }
+
+        /* 階段紋路：科技 */
+        .pattern-tech {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            background-image: linear-gradient(#90caf9 1px, transparent 1px), linear-gradient(90deg, #90caf9 1px, transparent 1px);
+            background-size: 20px 20px;
+            transition: opacity 1s;
+        }
+
+        /* 動畫：漂浮 */
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+
+        /* 能量粒子 */
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            animation: moveUp 2s linear forwards;
+        }
+        @keyframes moveUp {
+            to { transform: translateY(-150px); opacity: 0; }
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: #eee;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        #progress-fill {
+            width: 0%;
+            height: 100%;
+            background: #4caf50;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-between min-h-screen p-6">
+
+    <!-- Header -->
+    <div class="text-center mt-4">
+        <h1 class="text-2xl font-bold text-green-800">幸福彩蛋養成計畫</h1>
+        <p id="game-status" class="text-gray-600 text-sm mt-2">點擊或滑動，幫助彩蛋吸收能量</p>
+    </div>
+
+    <!-- Game Area -->
+    <div class="relative w-full flex flex-col items-center">
+        <!-- Info Toast -->
+        <div id="info-toast" class="absolute -top-16 bg-white px-4 py-2 rounded-full shadow-lg text-xs font-bold text-green-600 border border-green-100 opacity-0 transition-opacity">
+            + 能量吸收中
+        </div>
+
+        <!-- The Egg -->
+        <div class="egg-container animate-float" id="egg-target">
+            <div class="egg" id="main-egg">
+                <div id="p1" class="pattern-circular"></div>
+                <div id="p2" class="pattern-energy"></div>
+                <div id="p3" class="pattern-tech"></div>
+            </div>
+            <!-- Rabbit Icon (Emoji for placeholder) -->
+            <div class="absolute -bottom-4 -right-4 text-4xl">🐰</div>
+        </div>
+        
+        <!-- Interactive Zone -->
+        <div id="action-area" class="mt-12 w-full max-w-xs">
+            <div class="progress-bar mb-4">
+                <div id="progress-fill"></div>
+            </div>
+            
+            <div id="btn-container" class="grid grid-cols-1 gap-3">
+                <button id="main-action" class="bg-green-500 text-white py-4 rounded-xl font-bold shadow-lg active:scale-95 transition-transform">
+                    注入循環能量 🌱
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Knowledge Card (Hidden) -->
+    <div id="modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-6 z-50">
+        <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center">
+            <div id="modal-icon" class="text-5xl mb-4">🥚</div>
+            <h2 id="modal-title" class="text-xl font-bold mb-2">標題</h2>
+            <p id="modal-desc" class="text-gray-600 mb-6 text-sm leading-relaxed">描述內容</p>
+            <button onclick="closeModal()" class="bg-green-600 text-white px-8 py-2 rounded-full font-bold">繼續前進</button>
+        </div>
+    </div>
+
+    <!-- Final Overlay -->
+    <div id="final-screen" class="fixed inset-0 bg-white hidden flex-col items-center justify-center p-10 z-[60] text-center">
+        <div class="text-7xl mb-6">🌍</div>
+        <h2 class="text-3xl font-bold text-green-700 mb-4">孵化成功！</h2>
+        <p class="text-gray-600 mb-8">就像復活節象徵重生，<br>永豐餘正在轉型中，<br>孕育更永續的未來。</p>
+        <div class="bg-green-50 p-4 rounded-2xl mb-8 text-sm text-green-800">
+            獲得勳章：【綠色轉型先行者】
+        </div>
+        <button onclick="location.reload()" class="text-green-600 font-bold underline">再玩一次</button>
+    </div>
+
+    <script>
+        let stage = 1;
+        let progress = 0;
+        const totalStages = 3;
+        
+        const egg = document.getElementById('main-egg');
+        const fill = document.getElementById('progress-fill');
+        const btn = document.getElementById('main-action');
+        const statusText = document.getElementById('game-status');
+        const modal = document.getElementById('modal');
+
+        const stageData = {
+            1: {
+                title: "循環能量已集滿",
+                desc: "永豐餘從紙業起家，推動資源循環與零廢棄理念。紙纖維的循環利用是我們的綠色基因。",
+                btn: "注入綠能動力 ⚡",
+                pattern: "p1",
+                eggColor: "#e8f5e9",
+                icon: "🌿"
+            },
+            2: {
+                title: "綠能動力已充滿",
+                desc: "廢棄物也能變成能源！透過沼氣發電、木質素能源及 SRF 固態燃料，我們將資源轉化為綠色電力。",
+                btn: "啟動科技進化 💡",
+                pattern: "p2",
+                eggColor: "#fffde7",
+                icon: "⚡"
+            },
+            3: {
+                title: "科技研發大突破",
+                desc: "電子紙技術由元太科技發展，具備低耗電與環保優勢，正改變全球的顯示器未來。",
+                btn: "見證孵化時刻 🐣",
+                pattern: "p3",
+                eggColor: "#e3f2fd",
+                icon: "💡"
+            }
+        };
+
+        // 點擊事件
+        btn.addEventListener('click', () => {
+            if (progress < 100) {
+                progress += 10;
+                updateProgress();
+                createParticle();
+            }
+        });
+
+        function updateProgress() {
+            fill.style.width = progress + '%';
+            
+            if (progress >= 100) {
+                showKnowledge();
+            }
+        }
+
+        function createParticle() {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.innerHTML = ['🌱', '⚡', '💡'][stage-1];
+            p.style.left = (Math.random() * 60 + 20) + '%';
+            p.style.top = '50%';
+            document.querySelector('.egg-container').appendChild(p);
+            setTimeout(() => p.remove(), 2000);
+        }
+
+        function showKnowledge() {
+            const data = stageData[stage];
+            document.getElementById('modal-title').innerText = data.title;
+            document.getElementById('modal-desc').innerText = data.desc;
+            document.getElementById('modal-icon').innerText = data.icon;
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+            evolveEgg();
+        }
+
+        function evolveEgg() {
+            const data = stageData[stage];
+            
+            // 視覺進化
+            document.getElementById(data.pattern).style.opacity = '1';
+            egg.style.backgroundColor = data.eggColor;
+            egg.style.borderColor = data.eggColor;
+
+            if (stage < totalStages) {
+                stage++;
+                progress = 0;
+                fill.style.width = '0%';
+                btn.innerText = data.btn;
+                statusText.innerText = `進入第 ${stage} 階段：${data.btn.replace('注入', '').replace('啟動', '')}`;
+            } else {
+                hatch();
+            }
+        }
+
+        function hatch() {
+            egg.style.transform = 'scale(1.2) rotate(5deg)';
+            setTimeout(() => {
+                egg.style.transform = 'scale(0)';
+                egg.style.opacity = '0';
+                document.getElementById('final-screen').style.display = 'flex';
+            }, 1000);
+        }
+
+        // 簡易滑動偵測
+        let startY = 0;
+        document.addEventListener('touchstart', e => startY = e.touches[0].pageY);
+        document.addEventListener('touchend', e => {
+            let endY = e.changedTouches[0].pageY;
+            if (startY - endY > 50) { // 上滑
+                btn.click();
+            }
+        });
+    </script>
+</body>
+</html>
