@@ -1,282 +1,700 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>幸福彩蛋養成計畫 - 永豐餘復活節特企</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
-        
-        body {
-            font-family: 'Noto Sans TC', sans-serif;
-            background: linear-gradient(180deg, #e0f2f1 0%, #ffffff 100%);
-            overflow: hidden;
-            touch-action: manipulation;
-        }
-
-        /* 彩蛋基礎樣式 */
-        .egg-container {
-            position: relative;
-            width: 200px;
-            height: 260px;
-            margin: 0 auto;
-            transition: all 0.5s ease;
-        }
-
-        .egg {
-            width: 100%;
-            height: 100%;
-            background-color: #fff;
-            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-            box-shadow: inset -10px -10px 30px rgba(0,0,0,0.1), 0 10px 20px rgba(0,0,0,0.05);
-            position: relative;
-            overflow: hidden;
-            border: 4px solid #f0f0f0;
-            transition: all 0.8s ease;
-        }
-
-        /* 階段紋路：循環 */
-        .pattern-circular {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            background-image: radial-gradient(circle at 20px 20px, #a5d6a7 10%, transparent 10%);
-            background-size: 40px 40px;
-            transition: opacity 1s;
-        }
-
-        /* 階段紋路：綠能 */
-        .pattern-energy {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            background: linear-gradient(45deg, transparent 45%, #fff176 45%, #fff176 55%, transparent 55%);
-            background-size: 30px 30px;
-            transition: opacity 1s;
-        }
-
-        /* 階段紋路：科技 */
-        .pattern-tech {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            background-image: linear-gradient(#90caf9 1px, transparent 1px), linear-gradient(90deg, #90caf9 1px, transparent 1px);
-            background-size: 20px 20px;
-            transition: opacity 1s;
-        }
-
-        /* 動畫：漂浮 */
-        @keyframes float {
-            0% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-10px) rotate(2deg); }
-            100% { transform: translateY(0px) rotate(0deg); }
-        }
-        .animate-float { animation: float 3s ease-in-out infinite; }
-
-        /* 能量粒子 */
-        .particle {
-            position: absolute;
-            pointer-events: none;
-            animation: moveUp 2s linear forwards;
-        }
-        @keyframes moveUp {
-            to { transform: translateY(-150px); opacity: 0; }
-        }
-
-        .progress-bar {
-            height: 12px;
-            background: #eee;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        #progress-fill {
-            width: 0%;
-            height: 100%;
-            background: #4caf50;
-            transition: width 0.3s;
-        }
-    </style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+  <title>🥚 永豐餘彩蛋養成計畫</title>
+  <style>
+    :root {
+      --green:    #2d9e5f;
+      --green-lt: #5ebd84;
+      --green-dk: #1a6b3d;
+      --yellow:   #f5c842;
+      --yellow-lt:#fff3b0;
+      --pink:     #f4a7b9;
+      --pink-dk:  #e07090;
+      --sky:      #a8d8ea;
+      --cream:    #fdf6ec;
+      --brown:    #7a4f2e;
+      --text:     #2c3e2d;
+      --shadow:   rgba(0,0,0,0.15);
+    }
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+    html,body{
+      height:100%;overflow:hidden;
+      font-family:'Microsoft JhengHei','微軟正黑體',sans-serif;
+      color:var(--text);
+      background:#1a3a1f;
+      touch-action:none;
+    }
+    .screen{
+      position:fixed;inset:0;
+      display:none;flex-direction:column;
+      align-items:center;justify-content:center;
+      transition:opacity .5s;
+      overflow:hidden;
+    }
+    .screen.active{display:flex;}
+    #screen-start{
+      background:linear-gradient(160deg,#0d2b14 0%,#1e5c30 50%,#0d2b14 100%);
+    }
+    .start-glow{
+      position:absolute;inset:0;
+      background:radial-gradient(ellipse at 50% 40%, rgba(94,189,132,0.25) 0%,transparent 70%);
+      pointer-events:none;
+    }
+    .start-egg{
+      font-size:clamp(80px,20vw,140px);
+      animation:eggFloat 3s ease-in-out infinite;
+      filter:drop-shadow(0 0 40px rgba(94,189,132,0.6));
+      position:relative;z-index:2;
+    }
+    @keyframes eggFloat{
+      0%,100%{transform:translateY(0) rotate(-3deg);}
+      50%{transform:translateY(-18px) rotate(3deg);}
+    }
+    .start-logo{
+      font-family:'Microsoft JhengHei','微軟正黑體',sans-serif;
+      font-size:clamp(22px,6vw,42px);
+      color:#fff;
+      text-align:center;
+      line-height:1.2;
+      margin:16px 0 6px;
+      position:relative;z-index:2;
+    }
+    .start-logo span{color:var(--yellow);}
+    .start-sub{
+      color:#a0c8a8;font-size:13px;
+      text-align:center;margin-bottom:32px;
+      position:relative;z-index:2;letter-spacing:1px;
+    }
+    .btn-start{
+      background:linear-gradient(135deg,var(--green),var(--green-lt));
+      color:#fff;border:none;
+      padding:16px 48px;border-radius:999px;
+      font-family:'Microsoft JhengHei','微軟正黑體',sans-serif;font-size:22px;
+      cursor:pointer;position:relative;z-index:2;
+      box-shadow:0 8px 32px rgba(45,158,95,0.5);
+      letter-spacing:2px;
+      transition:transform .2s,box-shadow .2s;
+    }
+    .btn-start:active{transform:scale(.96);}
+    .start-bunny{
+      position:absolute;bottom:16px;right:20px;
+      font-size:52px;animation:bunnyWave 2s ease-in-out infinite;
+      z-index:2;
+    }
+    @keyframes bunnyWave{
+      0%,100%{transform:rotate(-5deg) translateY(0);}
+      50%{transform:rotate(8deg) translateY(-8px);}
+    }
+    .floating-leaf{
+      position:absolute;font-size:20px;opacity:.4;
+      animation:leafDrift linear infinite;pointer-events:none;
+    }
+    @keyframes leafDrift{
+      0%{transform:translateY(100vh) rotate(0deg);opacity:0;}
+      10%{opacity:.4;}
+      90%{opacity:.3;}
+      100%{transform:translateY(-60px) rotate(360deg);opacity:0;}
+    }
+    .game-bg{
+      position:fixed;inset:0;z-index:0;
+      background:linear-gradient(170deg,#0e2e16 0%,#1e5030 60%,#0a1f0e 100%);
+    }
+    .hud{
+      position:fixed;top:0;left:0;right:0;
+      padding:12px 16px 10px;
+      display:flex;align-items:center;justify-content:space-between;
+      z-index:50;
+      background:linear-gradient(180deg,rgba(0,0,0,.55) 0%,transparent 100%);
+    }
+    .hud-stage{
+      font-family:'Microsoft JhengHei','微軟正黑體',sans-serif;
+      color:var(--yellow);font-size:14px;letter-spacing:1px;
+    }
+    .hud-energy{display:flex;align-items:center;gap:8px;}
+    .energy-track{
+      width:140px;height:12px;
+      background:rgba(255,255,255,.15);border-radius:999px;overflow:hidden;
+      border:1.5px solid rgba(255,255,255,.25);
+    }
+    .energy-fill{
+      height:100%;border-radius:999px;
+      background:linear-gradient(90deg,var(--yellow),var(--green-lt));
+      transition:width .4s cubic-bezier(.34,1.56,.64,1);
+      width:0%;
+    }
+    .hud-egg-mini{font-size:22px;}
+    #screen-l1{background:transparent;}
+    #l1-canvas{position:fixed;inset:0;z-index:1;touch-action:none;}
+    #screen-l2{background:transparent;}
+    #l2-bg{
+      position:fixed;inset:0;z-index:1;
+      background:linear-gradient(160deg,#071a0e 0%,#0f2e1a 50%,#071a0e 100%);
+    }
+    #l2-content{
+      position:relative;z-index:10;
+      width:100%;max-width:440px;
+      padding:72px 20px 20px;
+      display:flex;flex-direction:column;align-items:center;
+    }
+    .l2-title{
+      font-family:'Microsoft JhengHei','微軟正黑體',sans-serif;
+      color:#fff;font-size:22px;letter-spacing:2px;
+      margin-bottom:6px;text-align:center;
+    }
+    .l2-subtitle{color:#6dbf8a;font-size:12px;margin-bottom:24px;text-align:center;letter-spacing:1px;}
+    .energy-devices{
+      display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
+      width:100%;margin-bottom:24px;
+    }
+    .device-btn{
+      background:rgba(255,255,255,.06);
+      border:2px solid rgba(255,255,255,.15);
+      border-radius:20px;padding:16px 8px;
+      cursor:pointer;text-align:center;
+      transition:transform .15s,background .2s,border-color .2s;
+      position:relative;overflow:hidden;
+      -webkit-user-select:none;user-select:none;
+    }
+    .device-btn:active{transform:scale(.93);}
+    .device-btn.charged{
+      background:rgba(94,189,132,.2);
+      border-color:var(--green-lt);
+      box-shadow:0 0 20px rgba(94,189,132,.3);
+    }
+    .device-emoji{font-size:36px;display:block;margin-bottom:6px;}
+    .device-name{color:#c8e6d0;font-size:11px;font-weight:700;letter-spacing:.5px;}
+    .device-tap{color:#7fb890;font-size:10px;margin-top:2px;}
+    .device-spark{
+      position:absolute;inset:0;
+      background:radial-gradient(circle at 50% 50%,rgba(245,200,66,.5),transparent 70%);
+      opacity:0;pointer-events:none;
+      animation:sparkPulse .3s ease forwards;
+    }
+    @keyframes sparkPulse{0%{opacity:0;transform:scale(.5);}50%{opacity:1;}100%{opacity:0;transform:scale(1.5);}}
+    .l2-power-bar{
+      width:100%;background:rgba(255,255,255,.1);
+      border-radius:999px;height:18px;overflow:hidden;
+      border:2px solid rgba(255,255,255,.2);margin-bottom:12px;
+    }
+    .l2-power-fill{
+      height:100%;border-radius:999px;
+      background:linear-gradient(90deg,#f59e0b,#f5c842,#a3e635);
+      transition:width .35s ease;width:0%;
+      box-shadow:0 0 12px rgba(245,200,66,.5);
+    }
+    .l2-power-label{color:#a0c8a0;font-size:12px;text-align:center;margin-bottom:20px;}
+    #screen-l3{background:transparent;}
+    #l3-bg{
+      position:fixed;inset:0;z-index:1;
+      background:linear-gradient(160deg,#050d1a 0%,#0a1f3a 60%,#050d1a 100%);
+    }
+    #l3-content{
+      position:relative;z-index:10;
+      width:100%;max-width:440px;
+      padding:72px 20px 20px;
+      display:flex;flex-direction:column;align-items:center;
+    }
+    .l3-title{font-family:'Microsoft JhengHei','微軟正黑體',sans-serif;color:#7dd3fc;font-size:22px;letter-spacing:2px;margin-bottom:6px;text-align:center;}
+    .l3-subtitle{color:#5b92b8;font-size:12px;margin-bottom:20px;text-align:center;letter-spacing:1px;}
+    .epaper-board{
+      width:min(300px,80vw);height:min(200px,54vw);
+      background:#1a2a3a;border:3px solid #2a4a6a;
+      border-radius:16px;margin-bottom:20px;
+      position:relative;overflow:hidden;
+      box-shadow:0 0 40px rgba(125,211,252,.2);
+    }
+    .epaper-screen{
+      position:absolute;inset:8px;
+      background:#0a1525;border-radius:10px;
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Microsoft JhengHei','微軟正黑體',sans-serif;color:#2a4a6a;
+      font-size:18px;letter-spacing:1px;
+      transition:all .5s;
+    }
+    .epaper-screen.lit{
+      background:#e8f4f8;color:#1a3a5a;
+      box-shadow:0 0 30px rgba(125,211,252,.4) inset;
+    }
+    .parts-grid{
+      display:grid;grid-template-columns:repeat(4,1fr);gap:10px;
+      width:100%;margin-bottom:20px;
+    }
+    .part-piece{
+      background:rgba(125,211,252,.08);
+      border:2px dashed rgba(125,211,252,.3);
+      border-radius:12px;padding:12px 6px;
+      cursor:pointer;text-align:center;
+      transition:transform .15s,opacity .4s;
+      -webkit-user-select:none;user-select:none;
+    }
+    .part-piece:active:not(.used){transform:scale(.9);}
+    .part-piece.used{opacity:.2;pointer-events:none;}
+    .part-emoji{font-size:26px;display:block;margin-bottom:4px;}
+    .part-name{color:#7dd3fc;font-size:9px;}
+    #overlay-egg{
+      position:fixed;inset:0;z-index:200;
+      background:rgba(0,0,0,.75);backdrop-filter:blur(8px);
+      display:none;flex-direction:column;align-items:center;justify-content:center;
+      padding:20px;
+    }
+    #overlay-egg.show{display:flex;animation:fadeIn .4s ease;}
+    @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+    .egg-reveal-big{
+      font-size:clamp(80px,22vw,130px);
+      animation:eggPop .6s cubic-bezier(.34,1.56,.64,1);
+      filter:drop-shadow(0 0 30px rgba(245,200,66,.7));
+    }
+    @keyframes eggPop{from{transform:scale(0) rotate(-20deg);}to{transform:scale(1) rotate(0deg);}}
+    .egg-reveal-name{
+      font-family:'Microsoft JhengHei','微軟正黑體',sans-serif;color:var(--yellow);
+      font-size:26px;margin:12px 0 6px;letter-spacing:2px;text-align:center;
+    }
+    .fact-box{
+      background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.2);
+      border-radius:16px;padding:16px 20px;max-width:340px;
+      color:#cde8d0;font-size:13px;line-height:1.8;text-align:center;margin-bottom:20px;
+    }
+    .fact-box strong{color:var(--yellow);}
+    .btn-next{
+      background:linear-gradient(135deg,var(--green),var(--green-lt));
+      color:#fff;border:none;padding:14px 44px;border-radius:999px;
+      font-family:'Microsoft JhengHei','微軟正黑體',sans-serif;font-size:20px;letter-spacing:2px;
+      cursor:pointer;box-shadow:0 6px 24px rgba(45,158,95,.5);
+      transition:transform .2s;
+    }
+    .btn-next:active{transform:scale(.95);}
+    #screen-final{
+      background:linear-gradient(160deg,#071a0e 0%,#0f3320 50%,#071a0e 100%);
+    }
+    #final-canvas{position:fixed;inset:0;z-index:1;}
+    #final-content{
+      position:relative;z-index:10;
+      display:flex;flex-direction:column;align-items:center;
+      padding:20px;text-align:center;max-width:400px;
+    }
+    .final-globe{
+      font-size:clamp(70px,18vw,120px);
+      animation:globeSpin 4s ease-in-out infinite;
+      filter:drop-shadow(0 0 40px rgba(94,189,132,.6));
+    }
+    @keyframes globeSpin{0%,100%{transform:scale(1) rotate(-5deg);}50%{transform:scale(1.1) rotate(5deg);}}
+    .final-eggs-row{font-size:36px;letter-spacing:4px;margin:12px 0;}
+    .final-title{
+      font-family:'Microsoft JhengHei','微軟正黑體',sans-serif;color:#fff;
+      font-size:clamp(20px,5vw,34px);letter-spacing:2px;margin-bottom:10px;
+    }
+    .final-quote{
+      color:#8ed0a0;font-size:13px;line-height:1.9;
+      border-left:3px solid var(--green);padding-left:14px;
+      text-align:left;margin-bottom:24px;
+    }
+    .final-eggs-collected{display:flex;gap:12px;margin-bottom:24px;}
+    .collected-egg{
+      background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.2);
+      border-radius:14px;padding:12px;text-align:center;font-size:28px;
+    }
+    .collected-egg-label{font-size:10px;color:#a0c8a0;margin-top:4px;display:block;}
+    .btn-restart{
+      background:linear-gradient(135deg,#f59e0b,var(--yellow));
+      color:#2c3e2d;border:none;padding:14px 44px;border-radius:999px;
+      font-family:'Microsoft JhengHei','微軟正黑體',sans-serif;font-size:20px;letter-spacing:2px;
+      cursor:pointer;box-shadow:0 6px 24px rgba(245,200,66,.4);
+    }
+    .confetti{
+      position:fixed;top:-10px;pointer-events:none;z-index:300;
+      animation:confettiFall linear forwards;
+      border-radius:2px;
+    }
+    @keyframes confettiFall{
+      0%{transform:translateY(0) rotate(0deg) translateX(0);opacity:1;}
+      100%{transform:translateY(110vh) rotate(720deg) translateX(var(--drift));opacity:0;}
+    }
+    #toast{
+      position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+      background:rgba(0,0,0,.75);backdrop-filter:blur(6px);
+      color:#fff;padding:10px 22px;border-radius:999px;
+      font-size:13px;letter-spacing:1px;z-index:100;
+      transition:opacity .5s;pointer-events:none;
+      white-space:nowrap;
+    }
+    #toast.hidden{opacity:0;}
+  </style>
 </head>
-<body class="flex flex-col items-center justify-between min-h-screen p-6">
+<body>
 
-    <!-- Header -->
-    <div class="text-center mt-4">
-        <h1 class="text-2xl font-bold text-green-800">幸福彩蛋養成計畫</h1>
-        <p id="game-status" class="text-gray-600 text-sm mt-2">點擊或滑動，幫助彩蛋吸收能量</p>
+<div id="screen-start" class="screen active">
+  <div class="start-glow"></div>
+  <div class="floating-leaf" style="left:10%;animation-duration:8s;animation-delay:0s;">🌿</div>
+  <div class="floating-leaf" style="left:30%;animation-duration:11s;animation-delay:-3s;">♻️</div>
+  <div class="floating-leaf" style="left:55%;animation-duration:9s;animation-delay:-6s;">🌱</div>
+  <div class="floating-leaf" style="left:75%;animation-duration:12s;animation-delay:-1s;">🍃</div>
+  <div class="floating-leaf" style="left:88%;animation-duration:7s;animation-delay:-4s;">🌿</div>
+  <div class="start-egg">🥚</div>
+  <div class="start-logo">永豐餘<span>彩蛋養成計畫</span></div>
+  <div class="start-sub">循環經濟 × 企業轉型 × 永續未來</div>
+  <button class="btn-start" onclick="startGame()">開始孵蛋 🐣</button>
+  <div class="start-bunny">🐰🐰</div>
+</div>
+
+<div id="screen-l1" class="screen">
+  <div class="game-bg"></div>
+  <canvas id="l1-canvas"></canvas>
+  <div class="hud">
+    <div class="hud-stage">🌳 第一關｜循環紙森林</div>
+    <div class="hud-energy">
+      <div class="energy-track"><div class="energy-fill" id="l1-fill"></div></div>
+      <div class="hud-egg-mini">🥚</div>
     </div>
+  </div>
+  <div id="toast">← 左右滑動收集紙纖維 →</div>
+</div>
 
-    <!-- Game Area -->
-    <div class="relative w-full flex flex-col items-center">
-        <!-- Info Toast -->
-        <div id="info-toast" class="absolute -top-16 bg-white px-4 py-2 rounded-full shadow-lg text-xs font-bold text-green-600 border border-green-100 opacity-0 transition-opacity">
-            + 能量吸收中
-        </div>
-
-        <!-- The Egg -->
-        <div class="egg-container animate-float" id="egg-target">
-            <div class="egg" id="main-egg">
-                <div id="p1" class="pattern-circular"></div>
-                <div id="p2" class="pattern-energy"></div>
-                <div id="p3" class="pattern-tech"></div>
-            </div>
-            <!-- Rabbit Icon (Emoji for placeholder) -->
-            <div class="absolute -bottom-4 -right-4 text-4xl">🐰</div>
-        </div>
-        
-        <!-- Interactive Zone -->
-        <div id="action-area" class="mt-12 w-full max-w-xs">
-            <div class="progress-bar mb-4">
-                <div id="progress-fill"></div>
-            </div>
-            
-            <div id="btn-container" class="grid grid-cols-1 gap-3">
-                <button id="main-action" class="bg-green-500 text-white py-4 rounded-xl font-bold shadow-lg active:scale-95 transition-transform">
-                    注入循環能量 🌱
-                </button>
-            </div>
-        </div>
+<div id="screen-l2" class="screen">
+  <div id="l2-bg"></div>
+  <div class="hud">
+    <div class="hud-stage">⚡ 第二關｜綠能發電基地</div>
+    <div class="hud-energy">
+      <div class="energy-track"><div class="energy-fill" id="l2-hud-fill"></div></div>
+      <div class="hud-egg-mini">🥚</div>
     </div>
-
-    <!-- Knowledge Card (Hidden) -->
-    <div id="modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-6 z-50">
-        <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center">
-            <div id="modal-icon" class="text-5xl mb-4">🥚</div>
-            <h2 id="modal-title" class="text-xl font-bold mb-2">標題</h2>
-            <p id="modal-desc" class="text-gray-600 mb-6 text-sm leading-relaxed">描述內容</p>
-            <button onclick="closeModal()" class="bg-green-600 text-white px-8 py-2 rounded-full font-bold">繼續前進</button>
-        </div>
+  </div>
+  <div id="l2-content">
+    <div class="l2-title">⚡ 綠能發電基地</div>
+    <div class="l2-subtitle">快速點擊能源裝置，讓電力條充滿！</div>
+    <div class="l2-power-bar"><div class="l2-power-fill" id="l2-fill"></div></div>
+    <div class="l2-power-label">電力充能：<span id="l2-pct">0</span>%</div>
+    <div class="energy-devices">
+      <div class="device-btn" id="dev-0" onclick="tapDevice(0)">
+        <span class="device-emoji">🔥</span>
+        <div class="device-name">沼氣發電</div>
+        <div class="device-tap">點擊充能</div>
+      </div>
+      <div class="device-btn" id="dev-1" onclick="tapDevice(1)">
+        <span class="device-emoji">🌿</span>
+        <div class="device-name">木質素能源</div>
+        <div class="device-tap">點擊充能</div>
+      </div>
+      <div class="device-btn" id="dev-2" onclick="tapDevice(2)">
+        <span class="device-emoji">♻️</span>
+        <div class="device-name">SRF固態燃料</div>
+        <div class="device-tap">點擊充能</div>
+      </div>
     </div>
+    <div style="color:#6dbf8a;font-size:12px;text-align:center;font-style:italic;">廢棄物，也能變成能源。</div>
+  </div>
+</div>
 
-    <!-- Final Overlay -->
-    <div id="final-screen" class="fixed inset-0 bg-white hidden flex-col items-center justify-center p-10 z-[60] text-center">
-        <div class="text-7xl mb-6">🌍</div>
-        <h2 class="text-3xl font-bold text-green-700 mb-4">孵化成功！</h2>
-        <p class="text-gray-600 mb-8">就像復活節象徵重生，<br>永豐餘正在轉型中，<br>孕育更永續的未來。</p>
-        <div class="bg-green-50 p-4 rounded-2xl mb-8 text-sm text-green-800">
-            獲得勳章：【綠色轉型先行者】
-        </div>
-        <button onclick="location.reload()" class="text-green-600 font-bold underline">再玩一次</button>
+<div id="screen-l3" class="screen">
+  <div id="l3-bg"></div>
+  <div class="hud">
+    <div class="hud-stage">💡 第三關｜未來科技實驗室</div>
+    <div class="hud-energy">
+      <div class="energy-track"><div class="energy-fill" id="l3-hud-fill"></div></div>
+      <div class="hud-egg-mini">🥚</div>
     </div>
+  </div>
+  <div id="l3-content">
+    <div class="l3-title">💡 未來科技實驗室</div>
+    <div class="l3-subtitle">點擊電子零件，組裝電子紙顯示器！</div>
+    <div class="epaper-board">
+      <div class="epaper-screen" id="epaper-screen">等待組裝中…</div>
+    </div>
+    <div class="parts-grid" id="parts-grid">
+      <div class="part-piece" onclick="addPart(0)"><span class="part-emoji">🔋</span><span class="part-name">電源模組</span></div>
+      <div class="part-piece" onclick="addPart(1)"><span class="part-emoji">📡</span><span class="part-name">訊號接收</span></div>
+      <div class="part-piece" onclick="addPart(2)"><span class="part-emoji">💾</span><span class="part-name">記憶晶片</span></div>
+      <div class="part-piece" onclick="addPart(3)"><span class="part-emoji">🖥️</span><span class="part-name">顯示模組</span></div>
+      <div class="part-piece" onclick="addPart(4)"><span class="part-emoji">⚡</span><span class="part-name">能量轉換</span></div>
+      <div class="part-piece" onclick="addPart(5)"><span class="part-emoji">🔬</span><span class="part-name">奈米塗層</span></div>
+      <div class="part-piece" onclick="addPart(6)"><span class="part-emoji">🌡️</span><span class="part-name">溫控感測</span></div>
+      <div class="part-piece" onclick="addPart(7)"><span class="part-emoji">🔧</span><span class="part-name">精密校正</span></div>
+    </div>
+    <div style="color:#5b8bb8;font-size:12px;text-align:center;font-style:italic;">低耗電顯示技術，改變未來。</div>
+  </div>
+</div>
 
-    <script>
-        let stage = 1;
-        let progress = 0;
-        const totalStages = 3;
-        
-        const egg = document.getElementById('main-egg');
-        const fill = document.getElementById('progress-fill');
-        const btn = document.getElementById('main-action');
-        const statusText = document.getElementById('game-status');
-        const modal = document.getElementById('modal');
+<div id="overlay-egg">
+  <div class="egg-reveal-big" id="egg-reveal-emoji">🥚</div>
+  <div class="egg-reveal-name" id="egg-reveal-name">循環彩蛋</div>
+  <div class="fact-box" id="egg-reveal-fact"></div>
+  <button class="btn-next" id="btn-next" onclick="nextStage()">繼續 →</button>
+</div>
 
-        const stageData = {
-            1: {
-                title: "循環能量已集滿",
-                desc: "永豐餘從紙業起家，推動資源循環與零廢棄理念。紙纖維的循環利用是我們的綠色基因。",
-                btn: "注入綠能動力 ⚡",
-                pattern: "p1",
-                eggColor: "#e8f5e9",
-                icon: "🌿"
-            },
-            2: {
-                title: "綠能動力已充滿",
-                desc: "廢棄物也能變成能源！透過沼氣發電、木質素能源及 SRF 固態燃料，我們將資源轉化為綠色電力。",
-                btn: "啟動科技進化 💡",
-                pattern: "p2",
-                eggColor: "#fffde7",
-                icon: "⚡"
-            },
-            3: {
-                title: "科技研發大突破",
-                desc: "電子紙技術由元太科技發展，具備低耗電與環保優勢，正改變全球的顯示器未來。",
-                btn: "見證孵化時刻 🐣",
-                pattern: "p3",
-                eggColor: "#e3f2fd",
-                icon: "💡"
-            }
-        };
+<div id="screen-final" class="screen">
+  <canvas id="final-canvas"></canvas>
+  <div id="final-content">
+    <div class="final-globe">🌍</div>
+    <div class="final-eggs-row">🥚✨🐣✨🥚</div>
+    <div class="final-title">彩蛋孵化成功！</div>
+    <div class="final-quote">
+      就像復活節象徵重生，<br>
+      永豐餘正在轉型中，<br>
+      孕育更永續的未來。<br>
+      <strong style="color:var(--green-lt)">循環．綠能．科技</strong>
+    </div>
+    <div class="final-eggs-collected">
+      <div class="collected-egg">🌿<span class="collected-egg-label">循環彩蛋</span></div>
+      <div class="collected-egg">⚡<span class="collected-egg-label">綠能彩蛋</span></div>
+      <div class="collected-egg">💡<span class="collected-egg-label">科技彩蛋</span></div>
+    </div>
+    <button class="btn-restart" onclick="restartGame()">再玩一次 🐰</button>
+  </div>
+</div>
 
-        // 點擊事件
-        btn.addEventListener('click', () => {
-            if (progress < 100) {
-                progress += 10;
-                updateProgress();
-                createParticle();
-            }
-        });
+<script>
+let currentStage = 0;
+let l1Energy = 0, l2Power = 0, l3Parts = 0;
+const L1_TARGET = 100, L2_TARGET = 100, L3_TARGET = 8;
 
-        function updateProgress() {
-            fill.style.width = progress + '%';
-            
-            if (progress >= 100) {
-                showKnowledge();
-            }
-        }
+const EGG_DATA = [
+  {
+    emoji: '🌿',
+    name: '循環彩蛋',
+    fact: `<strong>永豐餘</strong>從紙業起家，推動<strong>資源循環與零廢棄</strong>理念。<br>每一張再生紙，都是地球的第二次呼吸。`,
+    next: 'startL2'
+  },
+  {
+    emoji: '⚡',
+    name: '綠能彩蛋',
+    fact: `永豐餘透過<strong>沼氣發電、木質素能源</strong>以及<strong>SRF固態燃料</strong>，<br>將廢棄物再利用，產生綠色電力。`,
+    next: 'startL3'
+  },
+  {
+    emoji: '💡',
+    name: '科技彩蛋',
+    fact: `<strong>元太科技</strong>的電子紙技術具備<strong>低耗電與環保優勢</strong>，<br>正在重新定義未來的顯示科技。`,
+    next: 'startFinal'
+  }
+];
 
-        function createParticle() {
-            const p = document.createElement('div');
-            p.className = 'particle';
-            p.innerHTML = ['🌱', '⚡', '💡'][stage-1];
-            p.style.left = (Math.random() * 60 + 20) + '%';
-            p.style.top = '50%';
-            document.querySelector('.egg-container').appendChild(p);
-            setTimeout(() => p.remove(), 2000);
-        }
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
 
-        function showKnowledge() {
-            const data = stageData[stage];
-            document.getElementById('modal-title').innerText = data.title;
-            document.getElementById('modal-desc').innerText = data.desc;
-            document.getElementById('modal-icon').innerText = data.icon;
-            modal.style.display = 'flex';
-        }
+function startGame() { showScreen('screen-l1'); initL1(); }
 
-        function closeModal() {
-            modal.style.display = 'none';
-            evolveEgg();
-        }
+function restartGame() {
+  l1Energy=0; l2Power=0; l3Parts=0;
+  document.getElementById('l1-fill').style.width='0%';
+  document.getElementById('l2-fill').style.width='0%';
+  document.getElementById('l2-hud-fill').style.width='0%';
+  document.getElementById('l2-pct').textContent='0';
+  document.getElementById('l3-hud-fill').style.width='0%';
+  document.querySelectorAll('.device-btn').forEach(d=>d.classList.remove('charged'));
+  document.querySelectorAll('.part-piece').forEach(p=>p.classList.remove('used'));
+  document.getElementById('epaper-screen').className='epaper-screen';
+  document.getElementById('epaper-screen').textContent='等待組裝中…';
+  l2DevicePower=[0,0,0]; deviceCharged=[false,false,false];
+  showScreen('screen-start');
+}
 
-        function evolveEgg() {
-            const data = stageData[stage];
-            
-            // 視覺進化
-            document.getElementById(data.pattern).style.opacity = '1';
-            egg.style.backgroundColor = data.eggColor;
-            egg.style.borderColor = data.eggColor;
+function showToast(msg, dur=3000){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.remove('hidden');
+  clearTimeout(t._tid);
+  t._tid=setTimeout(()=>t.classList.add('hidden'), dur);
+}
 
-            if (stage < totalStages) {
-                stage++;
-                progress = 0;
-                fill.style.width = '0%';
-                btn.innerText = data.btn;
-                statusText.innerText = `進入第 ${stage} 階段：${data.btn.replace('注入', '').replace('啟動', '')}`;
-            } else {
-                hatch();
-            }
-        }
+function showEggReveal(idx){
+  const d=EGG_DATA[idx];
+  document.getElementById('egg-reveal-emoji').textContent=d.emoji;
+  document.getElementById('egg-reveal-name').textContent=d.name;
+  document.getElementById('egg-reveal-fact').innerHTML=d.fact;
+  document.getElementById('btn-next').dataset.cb=d.next;
+  document.getElementById('overlay-egg').classList.add('show');
+  launchConfetti(50);
+}
 
-        function hatch() {
-            egg.style.transform = 'scale(1.2) rotate(5deg)';
-            setTimeout(() => {
-                egg.style.transform = 'scale(0)';
-                egg.style.opacity = '0';
-                document.getElementById('final-screen').style.display = 'flex';
-            }, 1000);
-        }
+function nextStage(){
+  document.getElementById('overlay-egg').classList.remove('show');
+  const cb=document.getElementById('btn-next').dataset.cb;
+  if(cb==='startL2') startL2();
+  else if(cb==='startL3') startL3();
+  else if(cb==='startFinal') startFinal();
+}
 
-        // 簡易滑動偵測
-        let startY = 0;
-        document.addEventListener('touchstart', e => startY = e.touches[0].pageY);
-        document.addEventListener('touchend', e => {
-            let endY = e.changedTouches[0].pageY;
-            if (startY - endY > 50) { // 上滑
-                btn.click();
-            }
-        });
-    </script>
+/* ── LEVEL 1 ── */
+let l1Particles=[], l1Player={x:0,y:0}, l1Running=false, l1AnimId=null;
+
+function initL1(){
+  const canvas=document.getElementById('l1-canvas');
+  const W=canvas.width=window.innerWidth;
+  const H=canvas.height=window.innerHeight;
+  l1Player={x:W/2, y:H-120};
+  l1Particles=[]; l1Energy=0; l1Running=true;
+
+  function spawnParticle(){
+    if(!l1Running) return;
+    const types=['📄','🌿','♻️','🍃','📃'];
+    l1Particles.push({
+      x:Math.random()*W, y:-30,
+      vy:1.2+Math.random()*1.8, vx:(Math.random()-.5)*1.5,
+      type:types[Math.floor(Math.random()*types.length)],
+      size:22+Math.random()*16, rot:Math.random()*360, rotV:(Math.random()-.5)*4
+    });
+    setTimeout(spawnParticle, 600+Math.random()*700);
+  }
+  spawnParticle();
+
+  function onMove(e){
+    const ex=e.touches?e.touches[0].clientX:e.clientX;
+    l1Player.x=Math.max(30,Math.min(W-30,ex));
+  }
+  canvas.addEventListener('touchmove',onMove,{passive:true});
+  canvas.addEventListener('mousemove',onMove);
+
+  function loop(){
+    if(!l1Running){cancelAnimationFrame(l1AnimId);return;}
+    l1AnimId=requestAnimationFrame(loop);
+    const ctx=canvas.getContext('2d');
+    ctx.clearRect(0,0,W,H);
+    drawForest(ctx,W,H);
+    for(let i=l1Particles.length-1;i>=0;i--){
+      const p=l1Particles[i];
+      p.x+=p.vx; p.y+=p.vy; p.rot+=p.rotV;
+      const dx=p.x-l1Player.x, dy=p.y-l1Player.y;
+      if(Math.abs(dx)<50&&Math.abs(dy)<50){
+        l1Particles.splice(i,1); addL1Energy(7); spawnCollectPop(p.x,p.y); continue;
+      }
+      if(p.y>H+40){l1Particles.splice(i,1);continue;}
+      ctx.save();
+      ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
+      ctx.font=`${p.size}px serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(p.type,0,0); ctx.restore();
+    }
+    ctx.save();
+    ctx.font='52px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('🐰🐰',l1Player.x,l1Player.y);
+    ctx.beginPath(); ctx.arc(l1Player.x,l1Player.y+20,36,0,Math.PI*2);
+    ctx.fillStyle='rgba(94,189,132,0.15)'; ctx.fill(); ctx.restore();
+    const pct=l1Energy/L1_TARGET;
+    ctx.fillStyle='rgba(0,0,0,.4)'; ctx.fillRect(W/2-100,H-40,200,14);
+    const grad=ctx.createLinearGradient(W/2-100,0,W/2+100,0);
+    grad.addColorStop(0,'#2d9e5f'); grad.addColorStop(1,'#f5c842');
+    ctx.fillStyle=grad; ctx.fillRect(W/2-100,H-40,200*pct,14);
+    ctx.strokeStyle='rgba(255,255,255,.3)'; ctx.strokeRect(W/2-100,H-40,200,14);
+  }
+  l1AnimId=requestAnimationFrame(loop);
+  showToast('← 左右滑動收集紙纖維 →', 3500);
+}
+
+function drawForest(ctx,W,H){
+  const sky=ctx.createLinearGradient(0,0,0,H);
+  sky.addColorStop(0,'#071a0e'); sky.addColorStop(1,'#1e5030');
+  ctx.fillStyle=sky; ctx.fillRect(0,0,W,H);
+  [{x:.05,s:.7},{x:.15,s:.9},{x:.82,s:.85},{x:.93,s:.75},
+   {x:.5,s:.6,b:1},{x:.35,s:.55,b:1},{x:.65,s:.5,b:1}].forEach(t=>{
+    ctx.save(); ctx.globalAlpha=t.b?.25:.5;
+    ctx.font=`${t.s*90}px serif`; ctx.textAlign='center'; ctx.textBaseline='bottom';
+    ctx.fillText('🌳',t.x*W,H-20); ctx.restore();
+  });
+  ctx.fillStyle='#1a4a20'; ctx.fillRect(0,H-30,W,30);
+}
+
+function spawnCollectPop(x,y){
+  const el=document.createElement('div');
+  el.style.cssText=`position:fixed;left:${x}px;top:${y}px;font-size:20px;pointer-events:none;z-index:50;animation:floatPop .8s ease forwards;`;
+  el.textContent='+♻️'; document.body.appendChild(el);
+  setTimeout(()=>el.remove(),850);
+}
+
+function addL1Energy(v){
+  if(l1Energy>=L1_TARGET)return;
+  l1Energy=Math.min(L1_TARGET,l1Energy+v);
+  document.getElementById('l1-fill').style.width=(l1Energy/L1_TARGET*100)+'%';
+  if(l1Energy>=L1_TARGET){ l1Running=false; setTimeout(()=>showEggReveal(0),400); }
+}
+
+/* ── LEVEL 2 ── */
+let l2DevicePower=[0,0,0], deviceCharged=[false,false,false];
+const L2_DEVICE_TARGET=34;
+
+function startL2(){ showScreen('screen-l2'); showToast('點擊三種能源裝置，讓電力條充滿！',3500); }
+
+function tapDevice(idx){
+  if(deviceCharged[idx]) return;
+  l2DevicePower[idx]=Math.min(L2_DEVICE_TARGET,l2DevicePower[idx]+8);
+  const btn=document.getElementById('dev-'+idx);
+  const spark=document.createElement('div'); spark.className='device-spark';
+  btn.appendChild(spark); setTimeout(()=>spark.remove(),350);
+  if(l2DevicePower[idx]>=L2_DEVICE_TARGET){ deviceCharged[idx]=true; btn.classList.add('charged'); }
+  const total=l2DevicePower.reduce((a,b)=>a+b,0);
+  const pct=Math.min(100,Math.round(total/(L2_DEVICE_TARGET*3)*100));
+  l2Power=pct;
+  document.getElementById('l2-fill').style.width=pct+'%';
+  document.getElementById('l2-hud-fill').style.width=pct+'%';
+  document.getElementById('l2-pct').textContent=pct;
+  if(deviceCharged[0]&&deviceCharged[1]&&deviceCharged[2]){ setTimeout(()=>showEggReveal(1),400); }
+}
+
+/* ── LEVEL 3 ── */
+const EPAPER_STAGES=['電源接通…','訊號同步…','記憶體載入…','顯示就緒 ✓','能量轉換…','奈米塗層 ✓','溫度校正…','🖥️ 電子紙啟動！'];
+
+function startL3(){ showScreen('screen-l3'); showToast('點擊零件組裝電子紙顯示器！',3500); }
+
+function addPart(idx){
+  const piece=document.getElementById('parts-grid').children[idx];
+  if(piece.classList.contains('used'))return;
+  piece.classList.add('used'); l3Parts++;
+  document.getElementById('l3-hud-fill').style.width=(l3Parts/L3_TARGET*100)+'%';
+  const screen=document.getElementById('epaper-screen');
+  screen.textContent=EPAPER_STAGES[l3Parts-1];
+  if(l3Parts>=L3_TARGET){ screen.classList.add('lit'); setTimeout(()=>showEggReveal(2),500); }
+}
+
+/* ── FINAL ── */
+function startFinal(){ showScreen('screen-final'); launchConfetti(80); initFinalCanvas(); }
+
+function initFinalCanvas(){
+  const canvas=document.getElementById('final-canvas');
+  canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+  const ctx=canvas.getContext('2d');
+  const particles=[];
+  const EMOJIS=['🌿','⚡','💡','♻️','🌱','✨','🌍'];
+  for(let i=0;i<30;i++){
+    particles.push({
+      x:Math.random()*canvas.width, y:Math.random()*canvas.height,
+      vx:(Math.random()-.5)*.5, vy:-.4-Math.random()*.6,
+      emoji:EMOJIS[Math.floor(Math.random()*EMOJIS.length)],
+      size:16+Math.random()*20, alpha:.4+Math.random()*.4
+    });
+  }
+  (function loop(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.y<-30) p.y=canvas.height+20;
+      ctx.globalAlpha=p.alpha; ctx.font=p.size+'px serif'; ctx.fillText(p.emoji,p.x,p.y);
+    });
+    ctx.globalAlpha=1; requestAnimationFrame(loop);
+  })();
+}
+
+/* ── CONFETTI ── */
+const CONFETTI_COLORS=['#2d9e5f','#f5c842','#f4a7b9','#7dd3fc','#a3e635','#fb923c','#c084fc'];
+function launchConfetti(count=40){
+  for(let i=0;i<count;i++){
+    setTimeout(()=>{
+      const el=document.createElement('div'); el.className='confetti';
+      const drift=(Math.random()-.5)*200;
+      el.style.cssText=`left:${20+Math.random()*60}%;width:${8+Math.random()*10}px;height:${8+Math.random()*10}px;background:${CONFETTI_COLORS[Math.floor(Math.random()*CONFETTI_COLORS.length)]};border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${1+Math.random()*1.5}s;--drift:${drift}px;`;
+      document.body.appendChild(el); setTimeout(()=>el.remove(),2600);
+    }, i*30);
+  }
+}
+
+const style=document.createElement('style');
+style.textContent=`@keyframes floatPop{0%{opacity:1;transform:translate(-50%,-50%) scale(1.3);}100%{opacity:0;transform:translate(-50%,-180%) scale(.7);}}`;
+document.head.appendChild(style);
+
+window.addEventListener('resize',()=>{
+  const c=document.getElementById('l1-canvas');
+  if(c){c.width=window.innerWidth;c.height=window.innerHeight;}
+});
+</script>
 </body>
 </html>
